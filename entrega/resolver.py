@@ -20,16 +20,32 @@ def resolver():
     fragmentos = []
 
     # Fragmento 1: find + cat (carpeta oculta en proyecto/datos)
-    # TODO
+    salida, codigo = ejecutar("find proyecto/datos -name fragmento1.txt")
+    if codigo == 0 and salida:
+        ruta = salida.splitlines()[0]
+        contenido, codigo = ejecutar(f"cat '{ruta}'")
+        if codigo == 0:
+            fragmentos.append(contenido.split("FRAGMENTO 1:")[-1].strip().split()[0])
 
     # Fragmento 2: grep en proyecto/logs/app.log
-    # TODO
+    salida, codigo = ejecutar("grep -o 'fragmento2=[A-Z0-9]*' proyecto/logs/app.log")
+    if codigo == 0 and salida:
+        fragmentos.append(salida.split("=")[1])
 
     # Fragmento 3: mkdir + mv en proyecto/descargas, luego ejecutar('bash ../comprobar.sh orden')
-    # TODO
+    salida, codigo = ejecutar("bash ../comprobar.sh orden")
+    if codigo == 0 and "FRAGMENTO 3:" in salida:
+        fragmentos.append(salida.split("FRAGMENTO 3:")[-1].strip().split()[0])
 
     # Fragmento 4: chmod +x y ejecutar('cd proyecto && ./herramientas/revelar.sh', env={**os.environ, "AGENTE": "robot"})
-    # TODO
+    salida, codigo = ejecutar("chmod +x proyecto/herramientas/revelar.sh")
+    if codigo == 0:
+        salida, codigo = ejecutar(
+            "cd proyecto && ./herramientas/revelar.sh",
+            env={**os.environ, "AGENTE": "robot"}
+        )
+        if codigo == 0 and "FRAGMENTO 4:" in salida:
+            fragmentos.append(salida.split("FRAGMENTO 4:")[-1].strip().split()[0])
 
     clave = "-".join(fragmentos)
     print(f"\nCLAVE: {clave}")
